@@ -1,0 +1,90 @@
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+\documentclass{article}
+\usepackage[1in]{fullpage}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{enumitem}
+
+\usepackage{minted}
+\title{Maybe Overview}
+\author{Yihong Chen}
+\date{}
+\begin{document}
+
+\maketitle
+
+Maybe project let developers be able to defer choices about app behavior that difficult to made at development time.
+\section{Android Library}
+\label{sec:android-library}
+\begin{enumerate}[label=\alph*.]
+\item Communicate with \href{https://developer.android.com/google/gcm/index.html}{Google Cloud Messaging} and maybe backend server.
+
+Why Google Cloud Messaging? When backend server get a new choice(s) for one device, we need \textbf{push} the change to device.
+\item Collect logs from device.
+
+It should be able to cache logs and do batch upload.
+\item TODO: get decision tree from backend server and able to dynamically make decision on device.
+\end{enumerate}
+
+\section{Backend Server}
+\label{sec:backend-server}
+
+\subsection{Requirements}
+\label{sec:requirements}
+
+\begin{enumerate}[label=\alph*.]
+\item provide choices for all devices (each device may has different choices)
+\item push changes of choice
+\item collect logs
+\item TODO: send decision tree to device
+\end{enumerate}
+
+\subsection{Tech roadmap}
+\label{sec:tech-roadmap}
+We use \href{https://www.meteor.com/}{Meteor} to develop backend.
+
+repo address: \url{https://github.com/xcv58/backend}
+
+\section{Rewriter}
+\label{sec:rewriter}
+Change maybe style codes to ordinary Java code. Such as:
+convert
+\begin{minted}{java}
+maybe ("label") {
+    // do something 0
+} or {
+    // do something 1
+} or {
+    // do something 2
+}
+
+\end{minted}
+to
+\begin{minted}{java}
+int choice = maybeService.get("label");
+switch (choice) {
+    case 0:
+        // do something 0
+        break;
+    case 1:
+        // do something 1
+        break;
+    case 2:
+        // do something 2
+        break;
+    default:
+        maybeService.log("get invalid choice for " + choice + " label");
+        break;
+}
+\end{minted}
+TODO: IDE support
+TODO: build system integration
+
+\section{Learning Part}
+\label{sec:learning-part}
+\end{document}
