@@ -9,8 +9,22 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{enumitem}
-
 \usepackage{minted}
+\hypersetup{%
+  colorlinks=true,% hyperlinks will be coloured
+  linkcolor=green,% hyperlink text will be green
+  linkbordercolor=red,% hyperlink border will be red
+}
+
+\newcommand{\javafile}[1]{\inputminted
+[frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+fontsize=\footnotesize,
+linenos]
+{java}
+{#1}}
+
 \title{Maybe Overview}
 \author{Yihong Chen}
 \date{}
@@ -25,7 +39,7 @@ Maybe project let developers be able to defer choices about app behavior that di
 \item Communicate with \href{https://developer.android.com/google/gcm/index.html}{Google Cloud Messaging} and maybe backend server.
 
 Why Google Cloud Messaging? When backend server get a new choice(s) for one device, we need \textbf{push} the change to device.
-\item Collect logs from device.
+\item TODO: Collect logs from device.
 
 It should be able to cache logs and do batch upload.
 \item TODO: get decision tree from backend server and able to dynamically make decision on device.
@@ -43,9 +57,13 @@ Let develop easily attach a setting activity for maybe variables. It should be g
 
 \begin{enumerate}[label=\alph*.]
 \item provide choices for all devices (each device may has different choices)
+
+different schemas for value assignments of new device, such as: random,
+fixed, preassigned
 \item push changes of choice
-\item collect logs
+\item TODO: collect logs, \href{http://docs.mongodb.org/ecosystem/use-cases/storing-log-data/}{Storing Log Data in mongoDB}
 \item TODO: send decision tree to device
+\item TODO: user system and permission control
 \end{enumerate}
 
 \subsection{Tech roadmap}
@@ -59,51 +77,45 @@ repo address: \url{https://github.com/xcv58/backend}
 Change maybe style codes to ordinary Java code. Such as:
 convert
 
-\begin{minted}
-[frame=lines,
-framesep=2mm,
-baselinestretch=1.2,
-fontsize=\footnotesize,
-linenos]
-{java}
-maybe ("label") {
-    // do something 0
-} or {
-    // do something 1
-} or {
-    // do something 2
-}
-\end{minted}
+\javafile{maybe-origin.java}
 
 to
 
-\begin{minted}[
-frame=lines,
-framesep=2mm,
-baselinestretch=1.2,
-fontsize=\footnotesize,
-linenos
-]
-{java}
-int choice = maybeService.get("label");
-switch (choice) {
-    case 0:
-        // do something 0
-        break;
-    case 1:
-        // do something 1
-        break;
-    case 2:
-        // do something 2
-        break;
-    default:
-        maybeService.log("get invalid choice for " + choice + " label");
-        break;
-}
-\end{minted}
-TODO: IDE support
-TODO: build system integration
+\javafile{maybe-rewrite.java}
+
+\subsection{Current Implementation}
+\label{sec:curr-impl}
+Current version uses Python to implement rewriter. The basic idea is using
+regular expression to match maybe syntax, and convert it to switch case
+code block. In the meanwhile, it will upload metadata to maybe backend.
+repo: \url{ssh://src@blue.cse.buffalo.edu/projects/maybe/rewriter}
+
+But we need change some feature of current implemenatation.
+
+\subsection{TODO: Rewrite whole project instead one Java file}
+\label{sec:rewr-whole-proj}
+Current implemenatation can only rewrite one Java file. It takes the
+Java package name as the package name used in maybe metadata.
+
+But we need an unique namespace for an Android project.
+The Android package name is unique for an Android project.
+More details about Android package name can be found:
+\url{http://developer.android.com/guide/topics/manifest/manifest-element.html}
+
+\subsection{TODO: IDE Support}
+\label{sec:ide-support}
+The maybe syntax should be supported by IDE like Eclipse and Android Studio
+(IntelliJ IDEA). For Android Studio, we need to develop a plugin with
+grammar support for the syntax detection.
+
+TODO: how to integrate other features of IDE like auto complete.
+
+\subsection{TODO: Build System Integration}
+\label{sec:build-syst-integr}
+For build system, we can integrate our rewriter with Gradle.
+This highly depends how we implement new version of rewriter.
 
 \section{TODO: Learning Part}
 \label{sec:learning-part}
+
 \end{document}
